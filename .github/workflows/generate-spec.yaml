@@ -1,0 +1,26 @@
+name: generate-spec
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-golang-client:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+        # Checkout your code
+      - name: Checkout
+        uses: actions/checkout@v3
+
+        # Generate the client
+      - name: Generate Go client
+        uses: openapi-generators/openapitools-generator-action@v1
+        with:
+          generator: go
+          openapi-file: api/bluefin/openapi.yaml
+          config-file: build/bluefin/config.yaml
+          command-args: --skip-validate-spec -o bluefin/ --git-user-id home-sol --git-repo-id truenas-sdk
+          generator-tag: v6.5.0
+

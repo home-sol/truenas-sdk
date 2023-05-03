@@ -23,4 +23,5 @@ jobs:
           config-file: build/bluefin/config.yaml
           command-args: --skip-validate-spec -o bluefin/ --git-user-id home-sol --git-repo-id truenas-sdk
           generator-tag: v6.5.0
+          template-dir: build/openapi/templates/go
 

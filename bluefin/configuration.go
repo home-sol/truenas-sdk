@@ -31,6 +31,9 @@ var (
 	// ContextBasicAuth takes BasicAuth as authentication for the request.
 	ContextBasicAuth = contextKey("basic")
 
+	// ContextAccessToken takes a string oauth2 access token as authentication for the request.
+	ContextAccessToken = contextKey("accesstoken")
+
 	// ContextServerIndex uses a server configuration from the index.
 	ContextServerIndex = contextKey("serverIndex")
 
@@ -93,8 +96,14 @@ func NewConfiguration() *Configuration {
 		Debug:         false,
 		Servers: ServerConfigurations{
 			{
-				URL:         "https://192.168.40.2/api/v2.0",
+				URL:         "https://{server}/api/v2.0",
 				Description: "No description provided",
+				Variables: map[string]ServerVariable{
+					"server": ServerVariable{
+						Description:  "host name or ip",
+						DefaultValue: "truenas",
+					},
+				},
 			},
 		},
 		OperationServers: map[string]ServerConfigurations{},

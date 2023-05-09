@@ -22,75 +22,196 @@ import (
 // DiskApiService DiskApi service
 type DiskApiService service
 
-type ApiDiskGetRequest struct {
+type ApiGetDiskRequest struct {
 	ctx        context.Context
 	ApiService *DiskApiService
-	limit      *int32
-	offset     *int32
-	count      *bool
-	sort       *string
+	id         string
 }
 
-func (r ApiDiskGetRequest) Limit(limit int32) ApiDiskGetRequest {
+func (r ApiGetDiskRequest) Execute() (*Disk, *http.Response, error) {
+	return r.ApiService.GetDiskExecute(r)
+}
+
+/*
+GetDisk Method for GetDisk
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id Disk ID
+	@return ApiGetDiskRequest
+*/
+func (a *DiskApiService) GetDisk(ctx context.Context, id string) ApiGetDiskRequest {
+	return ApiGetDiskRequest{
+		ApiService: a,
+		ctx:        ctx,
+		id:         id,
+	}
+}
+
+// Execute executes the request
+//
+//	@return Disk
+func (a *DiskApiService) GetDiskExecute(r ApiGetDiskRequest) (*Disk, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Disk
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.GetDisk")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/disk/id/{id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiListDisksRequest struct {
+	ctx                 context.Context
+	ApiService          *DiskApiService
+	limit               *int32
+	offset              *int32
+	count               *bool
+	sort                *string
+	extraIncludeExpired *bool
+	extraPasswords      *bool
+	extraSupportsSmart  *bool
+	extraPools          *bool
+}
+
+func (r ApiListDisksRequest) Limit(limit int32) ApiListDisksRequest {
 	r.limit = &limit
 	return r
 }
 
-func (r ApiDiskGetRequest) Offset(offset int32) ApiDiskGetRequest {
+func (r ApiListDisksRequest) Offset(offset int32) ApiListDisksRequest {
 	r.offset = &offset
 	return r
 }
 
-func (r ApiDiskGetRequest) Count(count bool) ApiDiskGetRequest {
+func (r ApiListDisksRequest) Count(count bool) ApiListDisksRequest {
 	r.count = &count
 	return r
 }
 
-func (r ApiDiskGetRequest) Sort(sort string) ApiDiskGetRequest {
+func (r ApiListDisksRequest) Sort(sort string) ApiListDisksRequest {
 	r.sort = &sort
 	return r
 }
 
-func (r ApiDiskGetRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskGetExecute(r)
+// will also include expired disks
+func (r ApiListDisksRequest) ExtraIncludeExpired(extraIncludeExpired bool) ApiListDisksRequest {
+	r.extraIncludeExpired = &extraIncludeExpired
+	return r
+}
+
+// will not hide KMIP password for the disks
+func (r ApiListDisksRequest) ExtraPasswords(extraPasswords bool) ApiListDisksRequest {
+	r.extraPasswords = &extraPasswords
+	return r
+}
+
+// will query if disks support S.M.A.R.T. Only supported if resulting disks count is not larger than one; otherwise, raises an error.
+func (r ApiListDisksRequest) ExtraSupportsSmart(extraSupportsSmart bool) ApiListDisksRequest {
+	r.extraSupportsSmart = &extraSupportsSmart
+	return r
+}
+
+// will join pool name for each disk
+func (r ApiListDisksRequest) ExtraPools(extraPools bool) ApiListDisksRequest {
+	r.extraPools = &extraPools
+	return r
+}
+
+func (r ApiListDisksRequest) Execute() ([]Disk, *http.Response, error) {
+	return r.ApiService.ListDisksExecute(r)
 }
 
 /*
-DiskGet Method for DiskGet
-
-Query disks.
-
-The following extra options are supported:
-
-	include_expired: true - will also include expired disks (default: false)
-	passwords: true - will not hide KMIP password for the disks (default: false)
-	supports_smart: true - will query if disks support S.M.A.R.T. Only supported if resulting disks count is
-	                       not larger than one; otherwise, raises an error.
-	pools: true - will join pool name for each disk (default: false)
-
-`query-options.extra` can be specified as query parameters with prefixing them with `extra.` prefix. For example, `extra.retrieve_properties=false` will pass `retrieve_properties` as an extra argument to pool/dataset endpoint.
+ListDisks Method for ListDisks
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiDiskGetRequest
+	@return ApiListDisksRequest
 */
-func (a *DiskApiService) DiskGet(ctx context.Context) ApiDiskGetRequest {
-	return ApiDiskGetRequest{
+func (a *DiskApiService) ListDisks(ctx context.Context) ApiListDisksRequest {
+	return ApiListDisksRequest{
 		ApiService: a,
 		ctx:        ctx,
 	}
 }
 
 // Execute executes the request
-func (a *DiskApiService) DiskGetExecute(r ApiDiskGetRequest) (*http.Response, error) {
+//
+//	@return []Disk
+func (a *DiskApiService) ListDisksExecute(r ApiListDisksRequest) ([]Disk, *http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodGet
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue []Disk
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskGet")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.ListDisks")
 	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
 	localVarPath := localBasePath + "/disk"
@@ -111,6 +232,18 @@ func (a *DiskApiService) DiskGetExecute(r ApiDiskGetRequest) (*http.Response, er
 	if r.sort != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "sort", r.sort, "")
 	}
+	if r.extraIncludeExpired != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "extra.include_expired", r.extraIncludeExpired, "")
+	}
+	if r.extraPasswords != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "extra.passwords", r.extraPasswords, "")
+	}
+	if r.extraSupportsSmart != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "extra.supports_smart", r.extraSupportsSmart, "")
+	}
+	if r.extraPools != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "extra.pools", r.extraPools, "")
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -121,7 +254,7 @@ func (a *DiskApiService) DiskGetExecute(r ApiDiskGetRequest) (*http.Response, er
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
+	localVarHTTPHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
@@ -130,19 +263,19 @@ func (a *DiskApiService) DiskGetExecute(r ApiDiskGetRequest) (*http.Response, er
 	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
-		return nil, err
+		return localVarReturnValue, nil, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(req)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -150,238 +283,46 @@ func (a *DiskApiService) DiskGetExecute(r ApiDiskGetRequest) (*http.Response, er
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		return localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiDiskGetInstancePostRequest struct {
-	ctx             context.Context
-	ApiService      *DiskApiService
-	diskGetInstance *DiskGetInstance
+type ApiUpdateDiskRequest struct {
+	ctx               context.Context
+	ApiService        *DiskApiService
+	id                string
+	updateDiskRequest *UpdateDiskRequest
 }
 
-func (r ApiDiskGetInstancePostRequest) DiskGetInstance(diskGetInstance DiskGetInstance) ApiDiskGetInstancePostRequest {
-	r.diskGetInstance = &diskGetInstance
+func (r ApiUpdateDiskRequest) UpdateDiskRequest(updateDiskRequest UpdateDiskRequest) ApiUpdateDiskRequest {
+	r.updateDiskRequest = &updateDiskRequest
 	return r
 }
 
-func (r ApiDiskGetInstancePostRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskGetInstancePostExecute(r)
+func (r ApiUpdateDiskRequest) Execute() (*Disk, *http.Response, error) {
+	return r.ApiService.UpdateDiskExecute(r)
 }
 
 /*
-DiskGetInstancePost Method for DiskGetInstancePost
-
-Returns instance matching `id`. If `id` is not found, Validation error is raised.
-
-Please see `query` method documentation for `options`.
+UpdateDisk Method for UpdateDisk
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiDiskGetInstancePostRequest
+	@param id Disk ID
+	@return ApiUpdateDiskRequest
 */
-func (a *DiskApiService) DiskGetInstancePost(ctx context.Context) ApiDiskGetInstancePostRequest {
-	return ApiDiskGetInstancePostRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-func (a *DiskApiService) DiskGetInstancePostExecute(r ApiDiskGetInstancePostRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodPost
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskGetInstancePost")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/disk/get_instance"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.diskGetInstance
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiDiskGetUnusedPostRequest struct {
-	ctx        context.Context
-	ApiService *DiskApiService
-	body       *bool
-}
-
-func (r ApiDiskGetUnusedPostRequest) Body(body bool) ApiDiskGetUnusedPostRequest {
-	r.body = &body
-	return r
-}
-
-func (r ApiDiskGetUnusedPostRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskGetUnusedPostExecute(r)
-}
-
-/*
-DiskGetUnusedPost Method for DiskGetUnusedPost
-
-Return disks that are not in use by any zpool that is currently imported. It will
-also return disks that are in use by any zpool that is exported.
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiDiskGetUnusedPostRequest
-*/
-func (a *DiskApiService) DiskGetUnusedPost(ctx context.Context) ApiDiskGetUnusedPostRequest {
-	return ApiDiskGetUnusedPostRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-func (a *DiskApiService) DiskGetUnusedPostExecute(r ApiDiskGetUnusedPostRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodPost
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskGetUnusedPost")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/disk/get_unused"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.body
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiDiskIdIdGetRequest struct {
-	ctx        context.Context
-	ApiService *DiskApiService
-	id         string
-}
-
-func (r ApiDiskIdIdGetRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskIdIdGetExecute(r)
-}
-
-/*
-DiskIdIdGet Method for DiskIdIdGet
-
-Query disks.
-
-The following extra options are supported:
-
-	include_expired: true - will also include expired disks (default: false)
-	passwords: true - will not hide KMIP password for the disks (default: false)
-	supports_smart: true - will query if disks support S.M.A.R.T. Only supported if resulting disks count is
-	                       not larger than one; otherwise, raises an error.
-	pools: true - will join pool name for each disk (default: false)
-
-`query-options.extra` can be specified as query parameters with prefixing them with `extra.` prefix. For example, `extra.retrieve_properties=false` will pass `retrieve_properties` as an extra argument to pool/dataset endpoint.
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param id
-	@return ApiDiskIdIdGetRequest
-*/
-func (a *DiskApiService) DiskIdIdGet(ctx context.Context, id string) ApiDiskIdIdGetRequest {
-	return ApiDiskIdIdGetRequest{
+func (a *DiskApiService) UpdateDisk(ctx context.Context, id string) ApiUpdateDiskRequest {
+	return ApiUpdateDiskRequest{
 		ApiService: a,
 		ctx:        ctx,
 		id:         id,
@@ -389,16 +330,19 @@ func (a *DiskApiService) DiskIdIdGet(ctx context.Context, id string) ApiDiskIdId
 }
 
 // Execute executes the request
-func (a *DiskApiService) DiskIdIdGetExecute(r ApiDiskIdIdGetRequest) (*http.Response, error) {
+//
+//	@return Disk
+func (a *DiskApiService) UpdateDiskExecute(r ApiUpdateDiskRequest) (*Disk, *http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodGet
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod  = http.MethodPut
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Disk
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskIdIdGet")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.UpdateDisk")
 	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
 	localVarPath := localBasePath + "/disk/id/{id}"
@@ -409,222 +353,6 @@ func (a *DiskApiService) DiskIdIdGetExecute(r ApiDiskIdIdGetRequest) (*http.Resp
 	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiDiskIdIdPutRequest struct {
-	ctx        context.Context
-	ApiService *DiskApiService
-	id         string
-}
-
-func (r ApiDiskIdIdPutRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskIdIdPutExecute(r)
-}
-
-/*
-DiskIdIdPut Method for DiskIdIdPut
-
-Update disk of `id`.
-
-If extra options need to be passed to SMART which we don't already support, they can be passed by
-`smartoptions`.
-
-`critical`, `informational` and `difference` are integer values on which alerts for SMART are configured
-if the disk temperature crosses the assigned threshold for each respective attribute.
-If they are set to null, then SMARTD config values are used as defaults.
-
-Email of log level LOG_CRIT is issued when disk temperature crosses `critical`.
-
-Email of log level LOG_INFO is issued when disk temperature crosses `informational`.
-
-If temperature of a disk changes by `difference` degree Celsius since the last report, SMART reports this.
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param id
-	@return ApiDiskIdIdPutRequest
-*/
-func (a *DiskApiService) DiskIdIdPut(ctx context.Context, id string) ApiDiskIdIdPutRequest {
-	return ApiDiskIdIdPutRequest{
-		ApiService: a,
-		ctx:        ctx,
-		id:         id,
-	}
-}
-
-// Execute executes the request
-func (a *DiskApiService) DiskIdIdPutExecute(r ApiDiskIdIdPutRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodPut
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskIdIdPut")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/disk/id/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiDiskResizePostRequest struct {
-	ctx        context.Context
-	ApiService *DiskApiService
-	diskResize *DiskResize
-}
-
-func (r ApiDiskResizePostRequest) DiskResize(diskResize DiskResize) ApiDiskResizePostRequest {
-	r.diskResize = &diskResize
-	return r
-}
-
-func (r ApiDiskResizePostRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskResizePostExecute(r)
-}
-
-/*
-DiskResizePost Method for DiskResizePost
-
-Takes a list of disks. Each list entry is a dict that requires a key, value pair.
-`name`: string (the name of the disk (i.e. sda))
-`size`: integer (given in gigabytes)
-`sync`: boolean, when true (default) will synchronize the new size of the disk(s)
-
-	with the database cache.
-
-`raise_error`: boolean
-
-	when true, will raise a `CallError` if any failures occur
-	when false, will will log the errors if any failures occur
-
-NOTE:
-
-	   if `size` is given, the disk with `name` will be resized
-	       to `size` (overprovision).
-	   if `size` is not given, the disk with `name` will be resized
-	       to it's original size (unoverprovision).
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiDiskResizePostRequest
-*/
-func (a *DiskApiService) DiskResizePost(ctx context.Context) ApiDiskResizePostRequest {
-	return ApiDiskResizePostRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-func (a *DiskApiService) DiskResizePostExecute(r ApiDiskResizePostRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodPost
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskResizePost")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/disk/resize"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
 
 	// set Content-Type header
@@ -634,7 +362,7 @@ func (a *DiskApiService) DiskResizePostExecute(r ApiDiskResizePostRequest) (*htt
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
+	localVarHTTPHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
@@ -642,22 +370,22 @@ func (a *DiskApiService) DiskResizePostExecute(r ApiDiskResizePostRequest) (*htt
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.diskResize
+	localVarPostBody = r.updateDiskRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
-		return nil, err
+		return localVarReturnValue, nil, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(req)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -665,688 +393,17 @@ func (a *DiskApiService) DiskResizePostExecute(r ApiDiskResizePostRequest) (*htt
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		return localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
-}
-
-type ApiDiskRetastePostRequest struct {
-	ctx         context.Context
-	ApiService  *DiskApiService
-	requestBody *[]string
-}
-
-func (r ApiDiskRetastePostRequest) RequestBody(requestBody []string) ApiDiskRetastePostRequest {
-	r.requestBody = &requestBody
-	return r
-}
-
-func (r ApiDiskRetastePostRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskRetastePostExecute(r)
-}
-
-/*
-DiskRetastePost Method for DiskRetastePost
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiDiskRetastePostRequest
-*/
-func (a *DiskApiService) DiskRetastePost(ctx context.Context) ApiDiskRetastePostRequest {
-	return ApiDiskRetastePostRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-func (a *DiskApiService) DiskRetastePostExecute(r ApiDiskRetastePostRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodPost
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskRetastePost")
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/disk/retaste"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.requestBody
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
 		newErr := &GenericOpenAPIError{
 			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
+			error: err.Error(),
 		}
-		return localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
-}
-
-type ApiDiskSmartAttributesPostRequest struct {
-	ctx        context.Context
-	ApiService *DiskApiService
-	body       *string
-}
-
-func (r ApiDiskSmartAttributesPostRequest) Body(body string) ApiDiskSmartAttributesPostRequest {
-	r.body = &body
-	return r
-}
-
-func (r ApiDiskSmartAttributesPostRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskSmartAttributesPostExecute(r)
-}
-
-/*
-DiskSmartAttributesPost Method for DiskSmartAttributesPost
-
-Returns S.M.A.R.T. attributes values for specified disk name.
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiDiskSmartAttributesPostRequest
-*/
-func (a *DiskApiService) DiskSmartAttributesPost(ctx context.Context) ApiDiskSmartAttributesPostRequest {
-	return ApiDiskSmartAttributesPostRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-func (a *DiskApiService) DiskSmartAttributesPostExecute(r ApiDiskSmartAttributesPostRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodPost
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskSmartAttributesPost")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/disk/smart_attributes"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.body
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiDiskTemperatureAggPostRequest struct {
-	ctx                context.Context
-	ApiService         *DiskApiService
-	diskTemperatureAgg *DiskTemperatureAgg
-}
-
-func (r ApiDiskTemperatureAggPostRequest) DiskTemperatureAgg(diskTemperatureAgg DiskTemperatureAgg) ApiDiskTemperatureAggPostRequest {
-	r.diskTemperatureAgg = &diskTemperatureAgg
-	return r
-}
-
-func (r ApiDiskTemperatureAggPostRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskTemperatureAggPostExecute(r)
-}
-
-/*
-DiskTemperatureAggPost Method for DiskTemperatureAggPost
-
-Returns min/max/avg temperature for `names` disks for the last `days` days.
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiDiskTemperatureAggPostRequest
-*/
-func (a *DiskApiService) DiskTemperatureAggPost(ctx context.Context) ApiDiskTemperatureAggPostRequest {
-	return ApiDiskTemperatureAggPostRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-func (a *DiskApiService) DiskTemperatureAggPostExecute(r ApiDiskTemperatureAggPostRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodPost
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskTemperatureAggPost")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/disk/temperature_agg"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.diskTemperatureAgg
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiDiskTemperatureAlertsPostRequest struct {
-	ctx         context.Context
-	ApiService  *DiskApiService
-	requestBody *[]string
-}
-
-func (r ApiDiskTemperatureAlertsPostRequest) RequestBody(requestBody []string) ApiDiskTemperatureAlertsPostRequest {
-	r.requestBody = &requestBody
-	return r
-}
-
-func (r ApiDiskTemperatureAlertsPostRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskTemperatureAlertsPostExecute(r)
-}
-
-/*
-DiskTemperatureAlertsPost Method for DiskTemperatureAlertsPost
-
-Returns existing temperature alerts for specified disk `names.`
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiDiskTemperatureAlertsPostRequest
-*/
-func (a *DiskApiService) DiskTemperatureAlertsPost(ctx context.Context) ApiDiskTemperatureAlertsPostRequest {
-	return ApiDiskTemperatureAlertsPostRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-func (a *DiskApiService) DiskTemperatureAlertsPostExecute(r ApiDiskTemperatureAlertsPostRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodPost
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskTemperatureAlertsPost")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/disk/temperature_alerts"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.requestBody
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiDiskTemperaturePostRequest struct {
-	ctx             context.Context
-	ApiService      *DiskApiService
-	diskTemperature *DiskTemperature
-}
-
-func (r ApiDiskTemperaturePostRequest) DiskTemperature(diskTemperature DiskTemperature) ApiDiskTemperaturePostRequest {
-	r.diskTemperature = &diskTemperature
-	return r
-}
-
-func (r ApiDiskTemperaturePostRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskTemperaturePostExecute(r)
-}
-
-/*
-DiskTemperaturePost Method for DiskTemperaturePost
-
-Returns temperature for device `name` using specified S.M.A.R.T. `powermode`. If `cache` is not null
-then the last cached within `cache` seconds value is used.
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiDiskTemperaturePostRequest
-*/
-func (a *DiskApiService) DiskTemperaturePost(ctx context.Context) ApiDiskTemperaturePostRequest {
-	return ApiDiskTemperaturePostRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-func (a *DiskApiService) DiskTemperaturePostExecute(r ApiDiskTemperaturePostRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodPost
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskTemperaturePost")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/disk/temperature"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.diskTemperature
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiDiskTemperaturesPostRequest struct {
-	ctx              context.Context
-	ApiService       *DiskApiService
-	diskTemperatures *DiskTemperatures
-}
-
-func (r ApiDiskTemperaturesPostRequest) DiskTemperatures(diskTemperatures DiskTemperatures) ApiDiskTemperaturesPostRequest {
-	r.diskTemperatures = &diskTemperatures
-	return r
-}
-
-func (r ApiDiskTemperaturesPostRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskTemperaturesPostExecute(r)
-}
-
-/*
-DiskTemperaturesPost Method for DiskTemperaturesPost
-
-Returns temperatures for a list of devices (runs in parallel).
-See `disk.temperature` documentation for more details.
-If `only_cached` is specified then this method only returns disk temperatures that exist in cache.
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiDiskTemperaturesPostRequest
-*/
-func (a *DiskApiService) DiskTemperaturesPost(ctx context.Context) ApiDiskTemperaturesPostRequest {
-	return ApiDiskTemperaturesPostRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-func (a *DiskApiService) DiskTemperaturesPostExecute(r ApiDiskTemperaturesPostRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodPost
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskTemperaturesPost")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/disk/temperatures"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.diskTemperatures
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiDiskWipePostRequest struct {
-	ctx        context.Context
-	ApiService *DiskApiService
-	diskWipe   *DiskWipe
-}
-
-func (r ApiDiskWipePostRequest) DiskWipe(diskWipe DiskWipe) ApiDiskWipePostRequest {
-	r.diskWipe = &diskWipe
-	return r
-}
-
-func (r ApiDiskWipePostRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DiskWipePostExecute(r)
-}
-
-/*
-DiskWipePost Method for DiskWipePost
-
-Performs a wipe of a disk `dev`.
-It can be of the following modes:
-
-  - QUICK: clean the first and last 32 megabytes on `dev`
-
-  - FULL: write whole disk with zero's
-
-  - FULL_RANDOM: write whole disk with random bytes
-
-    @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-    @return ApiDiskWipePostRequest
-*/
-func (a *DiskApiService) DiskWipePost(ctx context.Context) ApiDiskWipePostRequest {
-	return ApiDiskWipePostRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-func (a *DiskApiService) DiskWipePostExecute(r ApiDiskWipePostRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodPost
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DiskApiService.DiskWipePost")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/disk/wipe"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.diskWipe
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
+	return localVarReturnValue, localVarHTTPResponse, nil
 }

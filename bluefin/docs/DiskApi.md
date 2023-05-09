@@ -1,30 +1,86 @@
 # \DiskApi
 
-All URIs are relative to *https://192.168.40.2/api/v2.0*
+All URIs are relative to *https://truenas/api/v2.0*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**DiskGet**](DiskApi.md#DiskGet) | **Get** /disk | 
-[**DiskGetInstancePost**](DiskApi.md#DiskGetInstancePost) | **Post** /disk/get_instance | 
-[**DiskGetUnusedPost**](DiskApi.md#DiskGetUnusedPost) | **Post** /disk/get_unused | 
-[**DiskIdIdGet**](DiskApi.md#DiskIdIdGet) | **Get** /disk/id/{id} | 
-[**DiskIdIdPut**](DiskApi.md#DiskIdIdPut) | **Put** /disk/id/{id} | 
-[**DiskResizePost**](DiskApi.md#DiskResizePost) | **Post** /disk/resize | 
-[**DiskRetastePost**](DiskApi.md#DiskRetastePost) | **Post** /disk/retaste | 
-[**DiskSmartAttributesPost**](DiskApi.md#DiskSmartAttributesPost) | **Post** /disk/smart_attributes | 
-[**DiskTemperatureAggPost**](DiskApi.md#DiskTemperatureAggPost) | **Post** /disk/temperature_agg | 
-[**DiskTemperatureAlertsPost**](DiskApi.md#DiskTemperatureAlertsPost) | **Post** /disk/temperature_alerts | 
-[**DiskTemperaturePost**](DiskApi.md#DiskTemperaturePost) | **Post** /disk/temperature | 
-[**DiskTemperaturesPost**](DiskApi.md#DiskTemperaturesPost) | **Post** /disk/temperatures | 
-[**DiskWipePost**](DiskApi.md#DiskWipePost) | **Post** /disk/wipe | 
+[**GetDisk**](DiskApi.md#GetDisk) | **Get** /disk/id/{id} | 
+[**ListDisks**](DiskApi.md#ListDisks) | **Get** /disk | 
+[**UpdateDisk**](DiskApi.md#UpdateDisk) | **Put** /disk/id/{id} | 
 
 
 
-## DiskGet
+## GetDisk
 
-> DiskGet(ctx).Limit(limit).Offset(offset).Count(count).Sort(sort).Execute()
+> Disk GetDisk(ctx, id).Execute()
 
 
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
+)
+
+func main() {
+    id := "id_example" // string | Disk ID
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.DiskApi.GetDisk(context.Background(), id).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.GetDisk``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `GetDisk`: Disk
+    fmt.Fprintf(os.Stdout, "Response from `DiskApi.GetDisk`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | Disk ID | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiGetDiskRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+[**Disk**](Disk.md)
+
+### Authorization
+
+[BasicAuth](../README.md#BasicAuth), [BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ListDisks
+
+> []Disk ListDisks(ctx).Limit(limit).Offset(offset).Count(count).Sort(sort).ExtraIncludeExpired(extraIncludeExpired).ExtraPasswords(extraPasswords).ExtraSupportsSmart(extraSupportsSmart).ExtraPools(extraPools).Execute()
 
 
 
@@ -45,14 +101,20 @@ func main() {
     offset := int32(56) // int32 |  (optional)
     count := true // bool |  (optional)
     sort := "sort_example" // string |  (optional)
+    extraIncludeExpired := true // bool | will also include expired disks (optional) (default to false)
+    extraPasswords := true // bool | will not hide KMIP password for the disks (optional) (default to false)
+    extraSupportsSmart := true // bool | will query if disks support S.M.A.R.T. Only supported if resulting disks count is not larger than one; otherwise, raises an error. (optional) (default to false)
+    extraPools := true // bool | will join pool name for each disk (optional) (default to false)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskGet(context.Background()).Limit(limit).Offset(offset).Count(count).Sort(sort).Execute()
+    resp, r, err := apiClient.DiskApi.ListDisks(context.Background()).Limit(limit).Offset(offset).Count(count).Sort(sort).ExtraIncludeExpired(extraIncludeExpired).ExtraPasswords(extraPasswords).ExtraSupportsSmart(extraSupportsSmart).ExtraPools(extraPools).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskGet``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.ListDisks``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
+    // response from `ListDisks`: []Disk
+    fmt.Fprintf(os.Stdout, "Response from `DiskApi.ListDisks`: %v\n", resp)
 }
 ```
 
@@ -62,7 +124,7 @@ func main() {
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDiskGetRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiListDisksRequest struct via the builder pattern
 
 
 Name | Type | Description  | Notes
@@ -71,30 +133,32 @@ Name | Type | Description  | Notes
  **offset** | **int32** |  | 
  **count** | **bool** |  | 
  **sort** | **string** |  | 
+ **extraIncludeExpired** | **bool** | will also include expired disks | [default to false]
+ **extraPasswords** | **bool** | will not hide KMIP password for the disks | [default to false]
+ **extraSupportsSmart** | **bool** | will query if disks support S.M.A.R.T. Only supported if resulting disks count is not larger than one; otherwise, raises an error. | [default to false]
+ **extraPools** | **bool** | will join pool name for each disk | [default to false]
 
 ### Return type
 
- (empty response body)
+[**[]Disk**](Disk.md)
 
 ### Authorization
 
-[basic](../README.md#basic)
+[BasicAuth](../README.md#BasicAuth), [BearerAuth](../README.md#BearerAuth)
 
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: Not defined
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
 
-## DiskGetInstancePost
+## UpdateDisk
 
-> DiskGetInstancePost(ctx).DiskGetInstance(diskGetInstance).Execute()
-
-
+> Disk UpdateDisk(ctx, id).UpdateDiskRequest(updateDiskRequest).Execute()
 
 
 
@@ -111,143 +175,18 @@ import (
 )
 
 func main() {
-    diskGetInstance := *openapiclient.NewDiskGetInstance() // DiskGetInstance |  (optional)
+    id := "id_example" // string | Disk ID
+    updateDiskRequest := *openapiclient.NewUpdateDiskRequest(int32(123), "Lunid_example", "Description_example", NullableInt32(123), NullableInt32(123), NullableInt32(123), openapiclient.HDDStandby("ALWAYS ON"), openapiclient.AdvPowermgmt("DISABLED"), false) // UpdateDiskRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskGetInstancePost(context.Background()).DiskGetInstance(diskGetInstance).Execute()
+    resp, r, err := apiClient.DiskApi.UpdateDisk(context.Background(), id).UpdateDiskRequest(updateDiskRequest).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskGetInstancePost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.UpdateDisk``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDiskGetInstancePostRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **diskGetInstance** | [**DiskGetInstance**](DiskGetInstance.md) |  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DiskGetUnusedPost
-
-> DiskGetUnusedPost(ctx).Body(body).Execute()
-
-
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
-)
-
-func main() {
-    body := true // bool |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskGetUnusedPost(context.Background()).Body(body).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskGetUnusedPost``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDiskGetUnusedPostRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **body** | **bool** |  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DiskIdIdGet
-
-> DiskIdIdGet(ctx, id).Execute()
-
-
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
-)
-
-func main() {
-    id := "id_example" // string | 
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskIdIdGet(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskIdIdGet``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
+    // response from `UpdateDisk`: Disk
+    fmt.Fprintf(os.Stdout, "Response from `DiskApi.UpdateDisk`: %v\n", resp)
 }
 ```
 
@@ -257,609 +196,30 @@ func main() {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** |  | 
+**id** | **string** | Disk ID | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDiskIdIdGetRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiUpdateDiskRequest struct via the builder pattern
 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
+ **updateDiskRequest** | [**UpdateDiskRequest**](UpdateDiskRequest.md) |  | 
 
 ### Return type
 
- (empty response body)
+[**Disk**](Disk.md)
 
 ### Authorization
 
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DiskIdIdPut
-
-> DiskIdIdPut(ctx, id).Execute()
-
-
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
-)
-
-func main() {
-    id := "id_example" // string | 
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskIdIdPut(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskIdIdPut``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** |  | 
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDiskIdIdPutRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DiskResizePost
-
-> DiskResizePost(ctx).DiskResize(diskResize).Execute()
-
-
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
-)
-
-func main() {
-    diskResize := *openapiclient.NewDiskResize() // DiskResize |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskResizePost(context.Background()).DiskResize(diskResize).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskResizePost``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDiskResizePostRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **diskResize** | [**DiskResize**](DiskResize.md) |  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[basic](../README.md#basic)
+[BasicAuth](../README.md#BasicAuth), [BearerAuth](../README.md#BearerAuth)
 
 ### HTTP request headers
 
 - **Content-Type**: application/json
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DiskRetastePost
-
-> DiskRetastePost(ctx).RequestBody(requestBody).Execute()
-
-
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
-)
-
-func main() {
-    requestBody := []string{"Property_example"} // []string |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskRetastePost(context.Background()).RequestBody(requestBody).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskRetastePost``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDiskRetastePostRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **requestBody** | **[]string** |  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DiskSmartAttributesPost
-
-> DiskSmartAttributesPost(ctx).Body(body).Execute()
-
-
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
-)
-
-func main() {
-    body := "body_example" // string |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskSmartAttributesPost(context.Background()).Body(body).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskSmartAttributesPost``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDiskSmartAttributesPostRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **body** | **string** |  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DiskTemperatureAggPost
-
-> DiskTemperatureAggPost(ctx).DiskTemperatureAgg(diskTemperatureAgg).Execute()
-
-
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
-)
-
-func main() {
-    diskTemperatureAgg := *openapiclient.NewDiskTemperatureAgg() // DiskTemperatureAgg |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskTemperatureAggPost(context.Background()).DiskTemperatureAgg(diskTemperatureAgg).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskTemperatureAggPost``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDiskTemperatureAggPostRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **diskTemperatureAgg** | [**DiskTemperatureAgg**](DiskTemperatureAgg.md) |  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DiskTemperatureAlertsPost
-
-> DiskTemperatureAlertsPost(ctx).RequestBody(requestBody).Execute()
-
-
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
-)
-
-func main() {
-    requestBody := []string{"Property_example"} // []string |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskTemperatureAlertsPost(context.Background()).RequestBody(requestBody).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskTemperatureAlertsPost``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDiskTemperatureAlertsPostRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **requestBody** | **[]string** |  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DiskTemperaturePost
-
-> DiskTemperaturePost(ctx).DiskTemperature(diskTemperature).Execute()
-
-
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
-)
-
-func main() {
-    diskTemperature := *openapiclient.NewDiskTemperature() // DiskTemperature |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskTemperaturePost(context.Background()).DiskTemperature(diskTemperature).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskTemperaturePost``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDiskTemperaturePostRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **diskTemperature** | [**DiskTemperature**](DiskTemperature.md) |  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DiskTemperaturesPost
-
-> DiskTemperaturesPost(ctx).DiskTemperatures(diskTemperatures).Execute()
-
-
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
-)
-
-func main() {
-    diskTemperatures := *openapiclient.NewDiskTemperatures() // DiskTemperatures |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskTemperaturesPost(context.Background()).DiskTemperatures(diskTemperatures).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskTemperaturesPost``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDiskTemperaturesPostRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **diskTemperatures** | [**DiskTemperatures**](DiskTemperatures.md) |  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DiskWipePost
-
-> DiskWipePost(ctx).DiskWipe(diskWipe).Execute()
-
-
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "github.com/home-sol/truenas-sdk/bluefin"
-)
-
-func main() {
-    diskWipe := *openapiclient.NewDiskWipe() // DiskWipe |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    r, err := apiClient.DiskApi.DiskWipePost(context.Background()).DiskWipe(diskWipe).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DiskApi.DiskWipePost``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDiskWipePostRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **diskWipe** | [**DiskWipe**](DiskWipe.md) |  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: Not defined
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)

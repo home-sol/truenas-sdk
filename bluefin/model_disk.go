@@ -25,7 +25,7 @@ type Disk struct {
 	Number        int32          `json:"number"`
 	Serial        string         `json:"serial"`
 	Lunid         NullableString `json:"lunid"`
-	Size          int32          `json:"size"`
+	Size          int64          `json:"size"`
 	Description   string         `json:"description"`
 	Transfermode  string         `json:"transfermode"`
 	Hddstandby    HDDStandby     `json:"hddstandby"`
@@ -53,7 +53,7 @@ type Disk struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDisk(identifier string, name string, subsystem string, number int32, serial string, lunid NullableString, size int32, description string, transfermode string, hddstandby HDDStandby, advpowermgmt AdvPowermgmt, togglesmart bool, smartoptions string, expiretime NullableString, critical NullableInt32, difference NullableInt32, informational NullableInt32, model NullableString, rotationrate NullableInt32, type_ NullableString, zfsGuid NullableString, bus string, devname string, enclosure DiskEnclosure, pool NullableString) *Disk {
+func NewDisk(identifier string, name string, subsystem string, number int32, serial string, lunid NullableString, size int64, description string, transfermode string, hddstandby HDDStandby, advpowermgmt AdvPowermgmt, togglesmart bool, smartoptions string, expiretime NullableString, critical NullableInt32, difference NullableInt32, informational NullableInt32, model NullableString, rotationrate NullableInt32, type_ NullableString, zfsGuid NullableString, bus string, devname string, enclosure DiskEnclosure, pool NullableString) *Disk {
 	this := Disk{}
 	this.Identifier = identifier
 	this.Name = name
@@ -238,9 +238,9 @@ func (o *Disk) SetLunid(v string) {
 }
 
 // GetSize returns the Size field value
-func (o *Disk) GetSize() int32 {
+func (o *Disk) GetSize() int64 {
 	if o == nil {
-		var ret int32
+		var ret int64
 		return ret
 	}
 
@@ -249,7 +249,7 @@ func (o *Disk) GetSize() int32 {
 
 // GetSizeOk returns a tuple with the Size field value
 // and a boolean to check if the value has been set.
-func (o *Disk) GetSizeOk() (*int32, bool) {
+func (o *Disk) GetSizeOk() (*int64, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -257,7 +257,7 @@ func (o *Disk) GetSizeOk() (*int32, bool) {
 }
 
 // SetSize sets field value
-func (o *Disk) SetSize(v int32) {
+func (o *Disk) SetSize(v int64) {
 	o.Size = v
 }
 

@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **Number** | **int32** |  | 
 **Serial** | **string** |  | [readonly] 
 **Lunid** | **NullableString** |  | 
-**Size** | **int32** |  | [readonly] 
+**Size** | **int64** |  | [readonly] 
 **Description** | **string** |  | 
 **Transfermode** | **string** |  | [readonly] 
 **Hddstandby** | [**HDDStandby**](HDDStandby.md) |  | 
@@ -37,7 +37,7 @@ Name | Type | Description | Notes
 
 ### NewDisk
 
-`func NewDisk(identifier string, name string, subsystem string, number int32, serial string, lunid NullableString, size int32, description string, transfermode string, hddstandby HDDStandby, advpowermgmt AdvPowermgmt, togglesmart bool, smartoptions string, expiretime NullableString, critical NullableInt32, difference NullableInt32, informational NullableInt32, model NullableString, rotationrate NullableInt32, type_ NullableString, zfsGuid NullableString, bus string, devname string, enclosure DiskEnclosure, pool NullableString, ) *Disk`
+`func NewDisk(identifier string, name string, subsystem string, number int32, serial string, lunid NullableString, size int64, description string, transfermode string, hddstandby HDDStandby, advpowermgmt AdvPowermgmt, togglesmart bool, smartoptions string, expiretime NullableString, critical NullableInt32, difference NullableInt32, informational NullableInt32, model NullableString, rotationrate NullableInt32, type_ NullableString, zfsGuid NullableString, bus string, devname string, enclosure DiskEnclosure, pool NullableString, ) *Disk`
 
 NewDisk instantiates a new Disk object
 This constructor will assign default values to properties that have it defined,
@@ -184,20 +184,20 @@ SetLunid sets Lunid field to given value.
 UnsetLunid ensures that no value is present for Lunid, not even an explicit nil
 ### GetSize
 
-`func (o *Disk) GetSize() int32`
+`func (o *Disk) GetSize() int64`
 
 GetSize returns the Size field if non-nil, zero value otherwise.
 
 ### GetSizeOk
 
-`func (o *Disk) GetSizeOk() (*int32, bool)`
+`func (o *Disk) GetSizeOk() (*int64, bool)`
 
 GetSizeOk returns a tuple with the Size field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSize
 
-`func (o *Disk) SetSize(v int32)`
+`func (o *Disk) SetSize(v int64)`
 
 SetSize sets Size field to given value.
 

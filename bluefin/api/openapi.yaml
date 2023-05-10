@@ -254,6 +254,7 @@ components:
           nullable: true
           type: string
         size:
+          format: int64
           readOnly: true
           type: integer
         description:

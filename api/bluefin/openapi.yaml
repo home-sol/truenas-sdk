@@ -147,6 +147,25 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /pool:
+    get:
+      operationId: listPools
+      tags:
+        - pool
+      responses:
+        200:
+          description: 'A list of pools'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoolList'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+        - $ref: '#/components/parameters/CountParam'
+        - $ref: '#/components/parameters/SortParam'
 
 components:
   schemas:
@@ -160,6 +179,33 @@ components:
         - "128"
         - "192"
         - "254"
+    Device:
+      type: object
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        guid:
+          type: string
+        status:
+          type: string
+        stats:
+          type: object
+          additionalProperties: true
+        device:
+          type: string
+        disk:
+          type: string
+        children:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        unavail_disk:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
     DisksResponse:
       type: array
       items:
@@ -301,7 +347,24 @@ components:
       required:
         - id
         - name
+        - guid
+        - encrypt
+        - encryptkey
+        - encryptkey_path
+        - is_decrypted
+        - status
         - path
+        - scan
+        - healthy
+        - warning
+        - status_detail
+        - size
+        - allocated
+        - free
+        - freeing
+        - fragmentation
+        - autotrim
+        - topology
       properties:
         id:
           type: integer
@@ -309,16 +372,119 @@ components:
           type: string
         guid:
           type: string
-        path:
+        encrypt:
+          type: integer
+        encryptkey:
           type: string
-        status:
-          type: string
-        healthy:
-          type: boolean
-        is_decrypted:
-          type: boolean
         encryptkey_path:
           type: string
+          nullable: true
+        is_decrypted:
+          type: boolean
+        status:
+          type: string
+        path:
+          type: string
+        scan:
+          type: object
+          additionalProperties: true
+        is_upgraded:
+          type: boolean
+        healthy:
+          type: boolean
+        warning:
+          type: boolean
+        status_detail:
+          type: string
+          nullable: true
+        size:
+          type: integer
+          format: int64
+          nullable: true
+        allocated:
+          type: integer
+          format: int64
+          nullable: true
+        free:
+          type: integer
+          format: int64
+          nullable: true
+        freeing:
+          type: integer
+          format: int64
+          nullable: true
+        fragmentation:
+          type: string
+          nullable: true
+        autotrim:
+          type: object
+          additionalProperties: true
+        topology:
+          type: object
+          required:
+            - data
+            - log
+            - cache
+            - spare
+            - special
+            - dedup
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/VDev'
+            log:
+              type: array
+              items:
+                $ref: '#/components/schemas/VDev'
+            cache:
+              type: array
+              items:
+                  $ref: '#/components/schemas/VDev'
+            spare:
+              type: array
+              items:
+                $ref: '#/components/schemas/VDev'
+            special:
+              type: array
+              items:
+                  $ref: '#/components/schemas/VDev'
+            dedup:
+              type: array
+              items:
+                  $ref: '#/components/schemas/VDev'
+          additionalProperties: true
+    PoolList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Pool'
+
+    VDev:
+      type: object
+      required:
+        - guid
+        - name
+        - type
+        - path
+        - status
+        - stats
+      properties:
+        guid:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        path:
+          type: string
+          nullable: true
+        status:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Device'
+      additionalProperties: true
   responses:
     NotFound:
       description: Endpoint not found

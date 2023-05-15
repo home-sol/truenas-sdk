@@ -19,14 +19,27 @@ var _ MappedNullable = &Pool{}
 
 // Pool struct for Pool
 type Pool struct {
-	Id                   int32   `json:"id"`
-	Name                 string  `json:"name"`
-	Guid                 *string `json:"guid,omitempty"`
-	Path                 string  `json:"path"`
-	Status               *string `json:"status,omitempty"`
-	Healthy              *bool   `json:"healthy,omitempty"`
-	IsDecrypted          *bool   `json:"is_decrypted,omitempty"`
-	EncryptkeyPath       *string `json:"encryptkey_path,omitempty"`
+	Id                   int32                  `json:"id"`
+	Name                 string                 `json:"name"`
+	Guid                 string                 `json:"guid"`
+	Encrypt              int32                  `json:"encrypt"`
+	Encryptkey           string                 `json:"encryptkey"`
+	EncryptkeyPath       NullableString         `json:"encryptkey_path"`
+	IsDecrypted          bool                   `json:"is_decrypted"`
+	Status               string                 `json:"status"`
+	Path                 string                 `json:"path"`
+	Scan                 map[string]interface{} `json:"scan"`
+	IsUpgraded           *bool                  `json:"is_upgraded,omitempty"`
+	Healthy              bool                   `json:"healthy"`
+	Warning              bool                   `json:"warning"`
+	StatusDetail         NullableString         `json:"status_detail"`
+	Size                 NullableInt64          `json:"size"`
+	Allocated            NullableInt64          `json:"allocated"`
+	Free                 NullableInt64          `json:"free"`
+	Freeing              NullableInt64          `json:"freeing"`
+	Fragmentation        NullableString         `json:"fragmentation"`
+	Autotrim             map[string]interface{} `json:"autotrim"`
+	Topology             PoolTopology           `json:"topology"`
 	AdditionalProperties map[string]interface{}
 }
 
@@ -36,11 +49,28 @@ type _Pool Pool
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewPool(id int32, name string, path string) *Pool {
+func NewPool(id int32, name string, guid string, encrypt int32, encryptkey string, encryptkeyPath NullableString, isDecrypted bool, status string, path string, scan map[string]interface{}, healthy bool, warning bool, statusDetail NullableString, size NullableInt64, allocated NullableInt64, free NullableInt64, freeing NullableInt64, fragmentation NullableString, autotrim map[string]interface{}, topology PoolTopology) *Pool {
 	this := Pool{}
 	this.Id = id
 	this.Name = name
+	this.Guid = guid
+	this.Encrypt = encrypt
+	this.Encryptkey = encryptkey
+	this.EncryptkeyPath = encryptkeyPath
+	this.IsDecrypted = isDecrypted
+	this.Status = status
 	this.Path = path
+	this.Scan = scan
+	this.Healthy = healthy
+	this.Warning = warning
+	this.StatusDetail = statusDetail
+	this.Size = size
+	this.Allocated = allocated
+	this.Free = free
+	this.Freeing = freeing
+	this.Fragmentation = fragmentation
+	this.Autotrim = autotrim
+	this.Topology = topology
 	return &this
 }
 
@@ -100,36 +130,150 @@ func (o *Pool) SetName(v string) {
 	o.Name = v
 }
 
-// GetGuid returns the Guid field value if set, zero value otherwise.
+// GetGuid returns the Guid field value
 func (o *Pool) GetGuid() string {
-	if o == nil || IsNil(o.Guid) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Guid
+
+	return o.Guid
 }
 
-// GetGuidOk returns a tuple with the Guid field value if set, nil otherwise
+// GetGuidOk returns a tuple with the Guid field value
 // and a boolean to check if the value has been set.
 func (o *Pool) GetGuidOk() (*string, bool) {
-	if o == nil || IsNil(o.Guid) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Guid, true
+	return &o.Guid, true
 }
 
-// HasGuid returns a boolean if a field has been set.
-func (o *Pool) HasGuid() bool {
-	if o != nil && !IsNil(o.Guid) {
-		return true
+// SetGuid sets field value
+func (o *Pool) SetGuid(v string) {
+	o.Guid = v
+}
+
+// GetEncrypt returns the Encrypt field value
+func (o *Pool) GetEncrypt() int32 {
+	if o == nil {
+		var ret int32
+		return ret
 	}
 
-	return false
+	return o.Encrypt
 }
 
-// SetGuid gets a reference to the given string and assigns it to the Guid field.
-func (o *Pool) SetGuid(v string) {
-	o.Guid = &v
+// GetEncryptOk returns a tuple with the Encrypt field value
+// and a boolean to check if the value has been set.
+func (o *Pool) GetEncryptOk() (*int32, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Encrypt, true
+}
+
+// SetEncrypt sets field value
+func (o *Pool) SetEncrypt(v int32) {
+	o.Encrypt = v
+}
+
+// GetEncryptkey returns the Encryptkey field value
+func (o *Pool) GetEncryptkey() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Encryptkey
+}
+
+// GetEncryptkeyOk returns a tuple with the Encryptkey field value
+// and a boolean to check if the value has been set.
+func (o *Pool) GetEncryptkeyOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Encryptkey, true
+}
+
+// SetEncryptkey sets field value
+func (o *Pool) SetEncryptkey(v string) {
+	o.Encryptkey = v
+}
+
+// GetEncryptkeyPath returns the EncryptkeyPath field value
+// If the value is explicit nil, the zero value for string will be returned
+func (o *Pool) GetEncryptkeyPath() string {
+	if o == nil || o.EncryptkeyPath.Get() == nil {
+		var ret string
+		return ret
+	}
+
+	return *o.EncryptkeyPath.Get()
+}
+
+// GetEncryptkeyPathOk returns a tuple with the EncryptkeyPath field value
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *Pool) GetEncryptkeyPathOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.EncryptkeyPath.Get(), o.EncryptkeyPath.IsSet()
+}
+
+// SetEncryptkeyPath sets field value
+func (o *Pool) SetEncryptkeyPath(v string) {
+	o.EncryptkeyPath.Set(&v)
+}
+
+// GetIsDecrypted returns the IsDecrypted field value
+func (o *Pool) GetIsDecrypted() bool {
+	if o == nil {
+		var ret bool
+		return ret
+	}
+
+	return o.IsDecrypted
+}
+
+// GetIsDecryptedOk returns a tuple with the IsDecrypted field value
+// and a boolean to check if the value has been set.
+func (o *Pool) GetIsDecryptedOk() (*bool, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.IsDecrypted, true
+}
+
+// SetIsDecrypted sets field value
+func (o *Pool) SetIsDecrypted(v bool) {
+	o.IsDecrypted = v
+}
+
+// GetStatus returns the Status field value
+func (o *Pool) GetStatus() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Status
+}
+
+// GetStatusOk returns a tuple with the Status field value
+// and a boolean to check if the value has been set.
+func (o *Pool) GetStatusOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Status, true
+}
+
+// SetStatus sets field value
+func (o *Pool) SetStatus(v string) {
+	o.Status = v
 }
 
 // GetPath returns the Path field value
@@ -156,132 +300,312 @@ func (o *Pool) SetPath(v string) {
 	o.Path = v
 }
 
-// GetStatus returns the Status field value if set, zero value otherwise.
-func (o *Pool) GetStatus() string {
-	if o == nil || IsNil(o.Status) {
-		var ret string
+// GetScan returns the Scan field value
+func (o *Pool) GetScan() map[string]interface{} {
+	if o == nil {
+		var ret map[string]interface{}
 		return ret
 	}
-	return *o.Status
+
+	return o.Scan
 }
 
-// GetStatusOk returns a tuple with the Status field value if set, nil otherwise
+// GetScanOk returns a tuple with the Scan field value
 // and a boolean to check if the value has been set.
-func (o *Pool) GetStatusOk() (*string, bool) {
-	if o == nil || IsNil(o.Status) {
+func (o *Pool) GetScanOk() (map[string]interface{}, bool) {
+	if o == nil {
+		return map[string]interface{}{}, false
+	}
+	return o.Scan, true
+}
+
+// SetScan sets field value
+func (o *Pool) SetScan(v map[string]interface{}) {
+	o.Scan = v
+}
+
+// GetIsUpgraded returns the IsUpgraded field value if set, zero value otherwise.
+func (o *Pool) GetIsUpgraded() bool {
+	if o == nil || IsNil(o.IsUpgraded) {
+		var ret bool
+		return ret
+	}
+	return *o.IsUpgraded
+}
+
+// GetIsUpgradedOk returns a tuple with the IsUpgraded field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Pool) GetIsUpgradedOk() (*bool, bool) {
+	if o == nil || IsNil(o.IsUpgraded) {
 		return nil, false
 	}
-	return o.Status, true
+	return o.IsUpgraded, true
 }
 
-// HasStatus returns a boolean if a field has been set.
-func (o *Pool) HasStatus() bool {
-	if o != nil && !IsNil(o.Status) {
+// HasIsUpgraded returns a boolean if a field has been set.
+func (o *Pool) HasIsUpgraded() bool {
+	if o != nil && !IsNil(o.IsUpgraded) {
 		return true
 	}
 
 	return false
 }
 
-// SetStatus gets a reference to the given string and assigns it to the Status field.
-func (o *Pool) SetStatus(v string) {
-	o.Status = &v
+// SetIsUpgraded gets a reference to the given bool and assigns it to the IsUpgraded field.
+func (o *Pool) SetIsUpgraded(v bool) {
+	o.IsUpgraded = &v
 }
 
-// GetHealthy returns the Healthy field value if set, zero value otherwise.
+// GetHealthy returns the Healthy field value
 func (o *Pool) GetHealthy() bool {
-	if o == nil || IsNil(o.Healthy) {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.Healthy
+
+	return o.Healthy
 }
 
-// GetHealthyOk returns a tuple with the Healthy field value if set, nil otherwise
+// GetHealthyOk returns a tuple with the Healthy field value
 // and a boolean to check if the value has been set.
 func (o *Pool) GetHealthyOk() (*bool, bool) {
-	if o == nil || IsNil(o.Healthy) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Healthy, true
+	return &o.Healthy, true
 }
 
-// HasHealthy returns a boolean if a field has been set.
-func (o *Pool) HasHealthy() bool {
-	if o != nil && !IsNil(o.Healthy) {
-		return true
-	}
-
-	return false
-}
-
-// SetHealthy gets a reference to the given bool and assigns it to the Healthy field.
+// SetHealthy sets field value
 func (o *Pool) SetHealthy(v bool) {
-	o.Healthy = &v
+	o.Healthy = v
 }
 
-// GetIsDecrypted returns the IsDecrypted field value if set, zero value otherwise.
-func (o *Pool) GetIsDecrypted() bool {
-	if o == nil || IsNil(o.IsDecrypted) {
+// GetWarning returns the Warning field value
+func (o *Pool) GetWarning() bool {
+	if o == nil {
 		var ret bool
 		return ret
 	}
-	return *o.IsDecrypted
+
+	return o.Warning
 }
 
-// GetIsDecryptedOk returns a tuple with the IsDecrypted field value if set, nil otherwise
+// GetWarningOk returns a tuple with the Warning field value
 // and a boolean to check if the value has been set.
-func (o *Pool) GetIsDecryptedOk() (*bool, bool) {
-	if o == nil || IsNil(o.IsDecrypted) {
+func (o *Pool) GetWarningOk() (*bool, bool) {
+	if o == nil {
 		return nil, false
 	}
-	return o.IsDecrypted, true
+	return &o.Warning, true
 }
 
-// HasIsDecrypted returns a boolean if a field has been set.
-func (o *Pool) HasIsDecrypted() bool {
-	if o != nil && !IsNil(o.IsDecrypted) {
-		return true
-	}
-
-	return false
+// SetWarning sets field value
+func (o *Pool) SetWarning(v bool) {
+	o.Warning = v
 }
 
-// SetIsDecrypted gets a reference to the given bool and assigns it to the IsDecrypted field.
-func (o *Pool) SetIsDecrypted(v bool) {
-	o.IsDecrypted = &v
-}
-
-// GetEncryptkeyPath returns the EncryptkeyPath field value if set, zero value otherwise.
-func (o *Pool) GetEncryptkeyPath() string {
-	if o == nil || IsNil(o.EncryptkeyPath) {
+// GetStatusDetail returns the StatusDetail field value
+// If the value is explicit nil, the zero value for string will be returned
+func (o *Pool) GetStatusDetail() string {
+	if o == nil || o.StatusDetail.Get() == nil {
 		var ret string
 		return ret
 	}
-	return *o.EncryptkeyPath
+
+	return *o.StatusDetail.Get()
 }
 
-// GetEncryptkeyPathOk returns a tuple with the EncryptkeyPath field value if set, nil otherwise
+// GetStatusDetailOk returns a tuple with the StatusDetail field value
 // and a boolean to check if the value has been set.
-func (o *Pool) GetEncryptkeyPathOk() (*string, bool) {
-	if o == nil || IsNil(o.EncryptkeyPath) {
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *Pool) GetStatusDetailOk() (*string, bool) {
+	if o == nil {
 		return nil, false
 	}
-	return o.EncryptkeyPath, true
+	return o.StatusDetail.Get(), o.StatusDetail.IsSet()
 }
 
-// HasEncryptkeyPath returns a boolean if a field has been set.
-func (o *Pool) HasEncryptkeyPath() bool {
-	if o != nil && !IsNil(o.EncryptkeyPath) {
-		return true
+// SetStatusDetail sets field value
+func (o *Pool) SetStatusDetail(v string) {
+	o.StatusDetail.Set(&v)
+}
+
+// GetSize returns the Size field value
+// If the value is explicit nil, the zero value for int64 will be returned
+func (o *Pool) GetSize() int64 {
+	if o == nil || o.Size.Get() == nil {
+		var ret int64
+		return ret
 	}
 
-	return false
+	return *o.Size.Get()
 }
 
-// SetEncryptkeyPath gets a reference to the given string and assigns it to the EncryptkeyPath field.
-func (o *Pool) SetEncryptkeyPath(v string) {
-	o.EncryptkeyPath = &v
+// GetSizeOk returns a tuple with the Size field value
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *Pool) GetSizeOk() (*int64, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.Size.Get(), o.Size.IsSet()
+}
+
+// SetSize sets field value
+func (o *Pool) SetSize(v int64) {
+	o.Size.Set(&v)
+}
+
+// GetAllocated returns the Allocated field value
+// If the value is explicit nil, the zero value for int64 will be returned
+func (o *Pool) GetAllocated() int64 {
+	if o == nil || o.Allocated.Get() == nil {
+		var ret int64
+		return ret
+	}
+
+	return *o.Allocated.Get()
+}
+
+// GetAllocatedOk returns a tuple with the Allocated field value
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *Pool) GetAllocatedOk() (*int64, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.Allocated.Get(), o.Allocated.IsSet()
+}
+
+// SetAllocated sets field value
+func (o *Pool) SetAllocated(v int64) {
+	o.Allocated.Set(&v)
+}
+
+// GetFree returns the Free field value
+// If the value is explicit nil, the zero value for int64 will be returned
+func (o *Pool) GetFree() int64 {
+	if o == nil || o.Free.Get() == nil {
+		var ret int64
+		return ret
+	}
+
+	return *o.Free.Get()
+}
+
+// GetFreeOk returns a tuple with the Free field value
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *Pool) GetFreeOk() (*int64, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.Free.Get(), o.Free.IsSet()
+}
+
+// SetFree sets field value
+func (o *Pool) SetFree(v int64) {
+	o.Free.Set(&v)
+}
+
+// GetFreeing returns the Freeing field value
+// If the value is explicit nil, the zero value for int64 will be returned
+func (o *Pool) GetFreeing() int64 {
+	if o == nil || o.Freeing.Get() == nil {
+		var ret int64
+		return ret
+	}
+
+	return *o.Freeing.Get()
+}
+
+// GetFreeingOk returns a tuple with the Freeing field value
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *Pool) GetFreeingOk() (*int64, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.Freeing.Get(), o.Freeing.IsSet()
+}
+
+// SetFreeing sets field value
+func (o *Pool) SetFreeing(v int64) {
+	o.Freeing.Set(&v)
+}
+
+// GetFragmentation returns the Fragmentation field value
+// If the value is explicit nil, the zero value for string will be returned
+func (o *Pool) GetFragmentation() string {
+	if o == nil || o.Fragmentation.Get() == nil {
+		var ret string
+		return ret
+	}
+
+	return *o.Fragmentation.Get()
+}
+
+// GetFragmentationOk returns a tuple with the Fragmentation field value
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *Pool) GetFragmentationOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.Fragmentation.Get(), o.Fragmentation.IsSet()
+}
+
+// SetFragmentation sets field value
+func (o *Pool) SetFragmentation(v string) {
+	o.Fragmentation.Set(&v)
+}
+
+// GetAutotrim returns the Autotrim field value
+func (o *Pool) GetAutotrim() map[string]interface{} {
+	if o == nil {
+		var ret map[string]interface{}
+		return ret
+	}
+
+	return o.Autotrim
+}
+
+// GetAutotrimOk returns a tuple with the Autotrim field value
+// and a boolean to check if the value has been set.
+func (o *Pool) GetAutotrimOk() (map[string]interface{}, bool) {
+	if o == nil {
+		return map[string]interface{}{}, false
+	}
+	return o.Autotrim, true
+}
+
+// SetAutotrim sets field value
+func (o *Pool) SetAutotrim(v map[string]interface{}) {
+	o.Autotrim = v
+}
+
+// GetTopology returns the Topology field value
+func (o *Pool) GetTopology() PoolTopology {
+	if o == nil {
+		var ret PoolTopology
+		return ret
+	}
+
+	return o.Topology
+}
+
+// GetTopologyOk returns a tuple with the Topology field value
+// and a boolean to check if the value has been set.
+func (o *Pool) GetTopologyOk() (*PoolTopology, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Topology, true
+}
+
+// SetTopology sets field value
+func (o *Pool) SetTopology(v PoolTopology) {
+	o.Topology = v
 }
 
 func (o Pool) MarshalJSON() ([]byte, error) {
@@ -296,22 +620,27 @@ func (o Pool) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["id"] = o.Id
 	toSerialize["name"] = o.Name
-	if !IsNil(o.Guid) {
-		toSerialize["guid"] = o.Guid
-	}
+	toSerialize["guid"] = o.Guid
+	toSerialize["encrypt"] = o.Encrypt
+	toSerialize["encryptkey"] = o.Encryptkey
+	toSerialize["encryptkey_path"] = o.EncryptkeyPath.Get()
+	toSerialize["is_decrypted"] = o.IsDecrypted
+	toSerialize["status"] = o.Status
 	toSerialize["path"] = o.Path
-	if !IsNil(o.Status) {
-		toSerialize["status"] = o.Status
+	toSerialize["scan"] = o.Scan
+	if !IsNil(o.IsUpgraded) {
+		toSerialize["is_upgraded"] = o.IsUpgraded
 	}
-	if !IsNil(o.Healthy) {
-		toSerialize["healthy"] = o.Healthy
-	}
-	if !IsNil(o.IsDecrypted) {
-		toSerialize["is_decrypted"] = o.IsDecrypted
-	}
-	if !IsNil(o.EncryptkeyPath) {
-		toSerialize["encryptkey_path"] = o.EncryptkeyPath
-	}
+	toSerialize["healthy"] = o.Healthy
+	toSerialize["warning"] = o.Warning
+	toSerialize["status_detail"] = o.StatusDetail.Get()
+	toSerialize["size"] = o.Size.Get()
+	toSerialize["allocated"] = o.Allocated.Get()
+	toSerialize["free"] = o.Free.Get()
+	toSerialize["freeing"] = o.Freeing.Get()
+	toSerialize["fragmentation"] = o.Fragmentation.Get()
+	toSerialize["autotrim"] = o.Autotrim
+	toSerialize["topology"] = o.Topology
 
 	for key, value := range o.AdditionalProperties {
 		toSerialize[key] = value
@@ -333,11 +662,24 @@ func (o *Pool) UnmarshalJSON(bytes []byte) (err error) {
 		delete(additionalProperties, "id")
 		delete(additionalProperties, "name")
 		delete(additionalProperties, "guid")
-		delete(additionalProperties, "path")
-		delete(additionalProperties, "status")
-		delete(additionalProperties, "healthy")
-		delete(additionalProperties, "is_decrypted")
+		delete(additionalProperties, "encrypt")
+		delete(additionalProperties, "encryptkey")
 		delete(additionalProperties, "encryptkey_path")
+		delete(additionalProperties, "is_decrypted")
+		delete(additionalProperties, "status")
+		delete(additionalProperties, "path")
+		delete(additionalProperties, "scan")
+		delete(additionalProperties, "is_upgraded")
+		delete(additionalProperties, "healthy")
+		delete(additionalProperties, "warning")
+		delete(additionalProperties, "status_detail")
+		delete(additionalProperties, "size")
+		delete(additionalProperties, "allocated")
+		delete(additionalProperties, "free")
+		delete(additionalProperties, "freeing")
+		delete(additionalProperties, "fragmentation")
+		delete(additionalProperties, "autotrim")
+		delete(additionalProperties, "topology")
 		o.AdditionalProperties = additionalProperties
 	}
 

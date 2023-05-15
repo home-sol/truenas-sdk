@@ -49,6 +49,8 @@ type APIClient struct {
 	// API Services
 
 	DiskApi *DiskApiService
+
+	PoolApi *PoolApiService
 }
 
 type service struct {
@@ -68,6 +70,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 
 	// API Services
 	c.DiskApi = (*DiskApiService)(&c.common)
+	c.PoolApi = (*PoolApiService)(&c.common)
 
 	return c
 }

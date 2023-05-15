@@ -146,6 +146,49 @@ paths:
           description: Endpoint not found
       tags:
       - disk
+  /pool:
+    get:
+      operationId: listPools
+      parameters:
+      - explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: count
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoolList'
+          description: A list of pools
+        "401":
+          description: No authorization for this endpoint
+      tags:
+      - pool
 components:
   parameters:
     LimitParam:
@@ -198,6 +241,47 @@ components:
       - "192"
       - "254"
       type: string
+    Device:
+      additionalProperties: true
+      example:
+        path: path
+        disk: disk
+        stats:
+          key: ""
+        children:
+        - key: ""
+        - key: ""
+        name: name
+        guid: guid
+        device: device
+        status: status
+        unavail_disk:
+          key: ""
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        guid:
+          type: string
+        status:
+          type: string
+        stats:
+          additionalProperties: true
+          type: object
+        device:
+          type: string
+        disk:
+          type: string
+        children:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+        unavail_disk:
+          additionalProperties: true
+          type: object
+      type: object
     DisksResponse:
       items:
         $ref: '#/components/schemas/Disk'
@@ -360,6 +444,420 @@ components:
       - "330"
       type: string
     Pool:
+      example:
+        topology:
+          special:
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+          cache:
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+          data:
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+          log:
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+          dedup:
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+          spare:
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+          - path: path
+            children:
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            - path: path
+              disk: disk
+              stats:
+                key: ""
+              children:
+              - key: ""
+              - key: ""
+              name: name
+              guid: guid
+              device: device
+              status: status
+              unavail_disk:
+                key: ""
+            name: name
+            guid: guid
+            type: type
+            status: status
+        scan:
+          key: ""
+        is_decrypted: true
+        encryptkey: encryptkey
+        fragmentation: fragmentation
+        status_detail: status_detail
+        path: path
+        size: 1
+        freeing: 2
+        encrypt: 6
+        healthy: true
+        encryptkey_path: encryptkey_path
+        is_upgraded: true
+        name: name
+        guid: guid
+        warning: true
+        id: 0
+        free: 5
+        autotrim:
+          key: ""
+        status: status
+        allocated: 5
       properties:
         id:
           type: integer
@@ -367,20 +865,139 @@ components:
           type: string
         guid:
           type: string
+        encrypt:
+          type: integer
+        encryptkey:
+          type: string
+        encryptkey_path:
+          nullable: true
+          type: string
+        is_decrypted:
+          type: boolean
+        status:
+          type: string
         path:
+          type: string
+        scan:
+          additionalProperties: true
+          type: object
+        is_upgraded:
+          type: boolean
+        healthy:
+          type: boolean
+        warning:
+          type: boolean
+        status_detail:
+          nullable: true
+          type: string
+        size:
+          format: int64
+          nullable: true
+          type: integer
+        allocated:
+          format: int64
+          nullable: true
+          type: integer
+        free:
+          format: int64
+          nullable: true
+          type: integer
+        freeing:
+          format: int64
+          nullable: true
+          type: integer
+        fragmentation:
+          nullable: true
+          type: string
+        autotrim:
+          additionalProperties: true
+          type: object
+        topology:
+          $ref: '#/components/schemas/Pool_topology'
+      required:
+      - allocated
+      - autotrim
+      - encrypt
+      - encryptkey
+      - encryptkey_path
+      - fragmentation
+      - free
+      - freeing
+      - guid
+      - healthy
+      - id
+      - is_decrypted
+      - name
+      - path
+      - scan
+      - size
+      - status
+      - status_detail
+      - topology
+      - warning
+      type: object
+    PoolList:
+      items:
+        $ref: '#/components/schemas/Pool'
+      type: array
+    VDev:
+      additionalProperties: true
+      example:
+        path: path
+        children:
+        - path: path
+          disk: disk
+          stats:
+            key: ""
+          children:
+          - key: ""
+          - key: ""
+          name: name
+          guid: guid
+          device: device
+          status: status
+          unavail_disk:
+            key: ""
+        - path: path
+          disk: disk
+          stats:
+            key: ""
+          children:
+          - key: ""
+          - key: ""
+          name: name
+          guid: guid
+          device: device
+          status: status
+          unavail_disk:
+            key: ""
+        name: name
+        guid: guid
+        type: type
+        status: status
+      properties:
+        guid:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        path:
+          nullable: true
           type: string
         status:
           type: string
-        healthy:
-          type: boolean
-        is_decrypted:
-          type: boolean
-        encryptkey_path:
-          type: string
+        children:
+          items:
+            $ref: '#/components/schemas/Device'
+          type: array
       required:
-      - id
+      - guid
       - name
       - path
+      - stats
+      - status
+      - type
       type: object
     updateDisk_request:
       properties:
@@ -434,6 +1051,432 @@ components:
           type: integer
         slot:
           type: integer
+      type: object
+    Pool_topology:
+      additionalProperties: true
+      example:
+        special:
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+        cache:
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+        data:
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+        log:
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+        dedup:
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+        spare:
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+        - path: path
+          children:
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          - path: path
+            disk: disk
+            stats:
+              key: ""
+            children:
+            - key: ""
+            - key: ""
+            name: name
+            guid: guid
+            device: device
+            status: status
+            unavail_disk:
+              key: ""
+          name: name
+          guid: guid
+          type: type
+          status: status
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/VDev'
+          type: array
+        log:
+          items:
+            $ref: '#/components/schemas/VDev'
+          type: array
+        cache:
+          items:
+            $ref: '#/components/schemas/VDev'
+          type: array
+        spare:
+          items:
+            $ref: '#/components/schemas/VDev'
+          type: array
+        special:
+          items:
+            $ref: '#/components/schemas/VDev'
+          type: array
+        dedup:
+          items:
+            $ref: '#/components/schemas/VDev'
+          type: array
+      required:
+      - cache
+      - data
+      - dedup
+      - log
+      - spare
+      - special
       type: object
   securitySchemes:
     BasicAuth:

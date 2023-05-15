@@ -80,16 +80,20 @@ Class | Method | HTTP request | Description
 *DiskApi* | [**GetDisk**](docs/DiskApi.md#getdisk) | **Get** /disk/id/{id} | 
 *DiskApi* | [**ListDisks**](docs/DiskApi.md#listdisks) | **Get** /disk | 
 *DiskApi* | [**UpdateDisk**](docs/DiskApi.md#updatedisk) | **Put** /disk/id/{id} | 
+*PoolApi* | [**ListPools**](docs/PoolApi.md#listpools) | **Get** /pool | 
 
 
 ## Documentation For Models
 
  - [AdvPowermgmt](docs/AdvPowermgmt.md)
+ - [Device](docs/Device.md)
  - [Disk](docs/Disk.md)
  - [DiskEnclosure](docs/DiskEnclosure.md)
  - [HDDStandby](docs/HDDStandby.md)
  - [Pool](docs/Pool.md)
+ - [PoolTopology](docs/PoolTopology.md)
  - [UpdateDiskRequest](docs/UpdateDiskRequest.md)
+ - [VDev](docs/VDev.md)
 
 
 ## Documentation For Authorization
